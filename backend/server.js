@@ -39,7 +39,8 @@ async function start() {
         } catch (e) { if (!e.status) console.error('API request failed:', e.name); send(res, e.status || 500, { error: e.status ? e.message : 'Database or server error. Check the backend terminal.' }) }
     });
     server.on('error', async e => { console.error(e.code === 'EADDRINUSE' ? 'Port already in use. Change PORT in backend/.env and VITE_API_BASE_URL in frontend/.env, then restart both.' : `Server error: ${e.code || e.name}`); await client.close(); process.exitCode = 1 });
-    server.listen(Number(process.env.PORT || 4101), process.env.HOST || '127.0.0.1', () => console.log(`QuoteCraft API ready at http://${process.env.HOST || '127.0.0.1'}:${server.address().port}`));
+    const host = process.env.HOST || '0.0.0.0';
+    server.listen(Number(process.env.PORT || 4101), host, () => console.log(`QuoteCraft API ready at http://${host}:${server.address().port}`));
     async function shutdown() { server.close(async () => { await client.close(); process.exit(0) }); setTimeout(() => process.exit(0), 5000).unref() }
     process.on('SIGINT', shutdown); process.on('SIGTERM', shutdown);
 }
